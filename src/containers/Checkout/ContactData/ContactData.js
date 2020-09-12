@@ -12,41 +12,41 @@ class ContactData extends Component {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
-                    placeholder: 'Your Name',
+                    placeholder: 'Your Name'
                 },
-                value: '',
+                value: ''
             },
             street: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
-                    placeholder: 'Your Street No',
+                    placeholder: 'Street'
                 },
-                value: '',
+                value: ''
             },
             zipCode: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
-                    placeholder: 'ZIP CODE',
+                    placeholder: 'ZIP Code'
                 },
-                value: '',
+                value: ''
             },
             country: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
-                    placeholder: 'Your Country',
+                    placeholder: 'Country'
                 },
-                value: '',
+                value: ''
             },
             email: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'email',
-                    placeholder: 'Your Email Address',
+                    placeholder: 'Your E-Mail'
                 },
-                value: '',
+                value: ''
             },
             deliveryMethod: {
                 elementType: 'select',
@@ -56,8 +56,8 @@ class ContactData extends Component {
                         {value: 'cheapest', displayValue: 'Cheapest'}
                     ]
                 },
-                value: '',
-            },
+                value: ''
+            }
         },
         loading: false
     }
@@ -65,14 +65,19 @@ class ContactData extends Component {
     orderHandler = ( event ) => {
         event.preventDefault();
         this.setState( { loading: true } );
+        const formData = {};
+        for (let formElementIdentifier in this.state.orderForm) {
+            formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
+        }
         const order = {
             ingredients: this.props.ingredients,
             price: this.props.price,
+            orderData: formData
         }
         axios.post( '/orders.json', order )
             .then( response => {
                 this.setState( { loading: false } );
-                this.props.history.push('/');
+                this.props.history.push( '/' );
             } )
             .catch( error => {
                 this.setState( { loading: false } );
@@ -83,34 +88,33 @@ class ContactData extends Component {
         const updatedOrderForm = {
             ...this.state.orderForm
         };
-        const updatedFormElement = {
+        const updatedFormElement = { 
             ...updatedOrderForm[inputIdentifier]
         };
         updatedFormElement.value = event.target.value;
-        updatedOrderForm[inputIdentifier]= updatedFormElement;
+        updatedOrderForm[inputIdentifier] = updatedFormElement;
         this.setState({orderForm: updatedOrderForm});
     }
 
     render () {
         const formElementsArray = [];
-        for ( let key in this.state.orderForm ){
+        for (let key in this.state.orderForm) {
             formElementsArray.push({
                 id: key,
                 config: this.state.orderForm[key]
             });
         }
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
                 {formElementsArray.map(formElement => (
                     <Input 
-                    key= {formElement.id}
-                    elementType= {formElement.config.elementType}
-                    elementConfig = {formElement.config.elementConfig}
-                    value = {formElement.config.value}
-                    changed = {(event) => this.inputChangedHandler(event, formElement.id)}
-                    />
+                        key={formElement.id}
+                        elementType={formElement.config.elementType}
+                        elementConfig={formElement.config.elementConfig}
+                        value={formElement.config.value}
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                 ))}
-                <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+                <Button btnType="Success">ORDER</Button>
             </form>
         );
         if ( this.state.loading ) {
